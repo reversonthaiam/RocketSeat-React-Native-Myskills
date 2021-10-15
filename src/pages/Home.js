@@ -1,18 +1,35 @@
-import React, { useState } from 'react'
-import { View, TouchableOpacity, Platform, Text, StyleSheet, TextInput, SafeAreaView } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { View, TouchableOpacity, Platform, Text, StyleSheet, TextInput, SafeAreaView, FlatList, ScrollView, StatusBar } from 'react-native'
+import Button from '../components/Button'
+import SkillCard from '../components/SkillCard'
 
 export default function App() {
 
   const [newSkill, setNewSkill] = useState('')
   const [mySkills, setMySkills] = useState([])
+  const [gretting, setGretting] = useState('')
 
   function handleAddNewSkill() {
     setMySkills(oldState => [...oldState, newSkill])
   }
 
+  useEffect(() =>{
+    const currentHour = new Date().getHours()
+    console.log(currentHour)
+    if(currentHour < 12){
+      setGretting('Good morning')
+    }else if(currentHour >= 12 && currentHour < 18){
+      setGretting('Good afternoon')
+    }else{
+      setGretting('Good night')
+    }
+  } , [])
+
   return (
     <SafeAreaView style={styles.container}>
+      
       <Text style={styles.title}>Welcome, Reverson</Text>
+      <Text style={styles.grettings}>{gretting}</Text>
       <TextInput
         style={styles.input}
         placeholder="New skill"
@@ -20,17 +37,19 @@ export default function App() {
         onChangeText={setNewSkill}
       />
 
-      <TouchableOpacity onPress={handleAddNewSkill} style={styles.button}>
-        <Text style={styles.buttonText}>Adicionar</Text>
-      </TouchableOpacity>
+      <Button onPress={handleAddNewSkill}></Button>
+
 
       <Text style={[styles.title, { marginVertical: 50 }]}>My Skills</Text>
-
-      {mySkills.map(skill => (
-        <TouchableOpacity key={skill} style={styles.buttonSkill}>
-          <Text style={styles.textSkill}>{skill}</Text>
-        </TouchableOpacity>
-      ))}
+     
+     <FlatList
+      data={mySkills}
+      keyExtractor={item => item}
+      renderItem={({item}) => (
+        <SkillCard skill={item}></SkillCard>
+      )}
+     />
+    
     </SafeAreaView>
   )
 }
@@ -58,30 +77,11 @@ const styles = StyleSheet.create({
     marginTop: 30,
     borderRadius: 7
   },
-  button: {
-    backgroundColor: '#a370f7',
-    padding: 15,
-    borderRadius: 7,
-    alignItems: 'center',
-    marginTop: 20
-  },
-
-  buttonText: {
-    color: '#fff',
-    fontSize: 17,
-    fontWeight: 'bold'
-  },
-  buttonSkill: {
-    backgroundColor: '#1f1e25',
-    padding: 15,
-    borderRadius: 50,
-    alignItems: 'center'
-
-  },
-  textSkill: {
-    color: '#fff',
-    fontSize: 22,
-    fontWeight: 'bold',
-
+  grettings: {
+    color: '#fff'
   }
+
+
+
+
 })
